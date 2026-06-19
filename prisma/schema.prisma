@@ -9,76 +9,9 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  nom       String
+  name      String
   email     String   @unique
   password  String
-  role      String   @default("pharmacien")
+  role      String   @default("user")
   createdAt DateTime @default(now())
-  ventes    Vente[]
-}
-
-model Medicament {
-  id             Int          @id @default(autoincrement())
-  nom            String
-  categorie      String
-  description    String?
-  prixAchat      Float
-  prixVente      Float
-  quantite       Int          @default(0)
-  dateExpiration DateTime
-  codeBarres     String?
-  fabricant      String?
-  createdAt      DateTime     @default(now())
-  stocks         Stock[]
-  venteItems     VenteItem[]
-}
-
-model Stock {
-  id           Int        @id @default(autoincrement())
-  medicamentId Int
-  medicament   Medicament @relation(fields: [medicamentId], references: [id])
-  type         String     // ENTREE, SORTIE, AJUSTEMENT
-  quantite     Int
-  motif        String?
-  createdAt    DateTime   @default(now())
-}
-
-model Fournisseur {
-  id        Int      @id @default(autoincrement())
-  nom       String
-  telephone String
-  email     String?
-  adresse   String?
-  createdAt DateTime @default(now())
-}
-
-model Client {
-  id        Int      @id @default(autoincrement())
-  nom       String
-  telephone String?
-  email     String?
-  adresse   String?
-  createdAt DateTime @default(now())
-  ventes    Vente[]
-}
-
-model Vente {
-  id         Int         @id @default(autoincrement())
-  dateVente  DateTime    @default(now())
-  montant    Float
-  clientId   Int?
-  client     Client?     @relation(fields: [clientId], references: [id])
-  userId     Int
-  user       User        @relation(fields: [userId], references: [id])
-  items      VenteItem[]
-}
-
-model VenteItem {
-  id           Int        @id @default(autoincrement())
-  venteId      Int
-  vente        Vente      @relation(fields: [venteId], references: [id])
-  medicamentId Int
-  medicament   Medicament @relation(fields: [medicamentId], references: [id])
-  quantite     Int
-  prixUnitaire Float
 }

@@ -1,13 +1,25 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
+  // Récupération header Authorization
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "Token manquant" });
+
+  // Vérification existence token
+  if (!authHeader) {
+    return res.status(401).json({ message: "Token manquant" });
+  }
+
+  // Format : Bearer TOKEN
   const token = authHeader.split(" ")[1];
+
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    // Vérification et décodage token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Ajouter user décodé dans la requête
+    req.user = decoded;
     next();
-  } catch {
-    return res.status(401).json({ message: "Token invalide" });
+  } catch (error) {
+    return res.status(401).json({ message: "Token invalide ou expiré" });
   }
 };

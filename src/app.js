@@ -2,23 +2,49 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
-const routes = require("./routes");
+
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 const errorMiddleware = require("./middlewares/errorMiddleware");
+const rateLimiter = require("./middlewares/rateLimiter");
 
 const app = express();
 
-app.use(express.json());
-app.use(cors());
-app.use(helmet());
-app.use(morgan("dev"));
+// =============================
+// MIDDLEWARES GLOBAUX
+// =============================
+app.use(express.json());          // Lire JSON du body
+app.use(cors());                  // Autoriser frontend externe
+app.use(helmet());                // Sécurité HTTP
+app.use(morgan("dev"));           // Logger requêtes
+app.use(rateLimiter);             // Limiter les requêtes
 
-app.use("/api", routes);
+// =============================
+// ROUTES
+// =============================
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
+// Route test
 app.get("/", (req, res) => {
-  res.json({ message: "PharmaCare API — ENASTIC L2-S4-DAWM 2025-2026" });
+  res.json({
+    message: "API Backend TP2 — ENASTIC L2-S4-DAWM",
+    version: "1.0.0",
+    routes: {
+      auth: "/api/auth",
+      users: "/api/users",
+    },
+  });
 });
 
-app.use((req, res) => res.status(404).json({ message: "Route introuvable" }));
+// Route 404
+app.use((req, res) => {
+  res.status(404).json({ message: "Route introuvable" });
+});
+
+// =============================
+// MIDDLEWARE ERREURS (en dernier)
+// =============================
 app.use(errorMiddleware);
 
 module.exports = app;
